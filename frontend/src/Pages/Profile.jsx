@@ -1,34 +1,53 @@
 // src/pages/Profile.jsx
+import { useAuth } from '../Context/AuthContext';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Container } from '@mui/material';
-import axios from 'axios';
 import PostCard from '../components/PostCard';
 
 const Profile = () => {
-  const { id } = useParams();
-  const [user, setUser] = useState({});
-  const [posts, setPosts] = useState([]);
+  const { user } = useAuth();
+  const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const res = await axios.get(`http://localhost:5000/api/users/${id}`);
-      setUser(res.data.user);
-      setPosts(res.data.posts);
-    };
-    fetchProfile();
-  }, [id]);
+    // Simulate fetching user-specific posts
+    const dummyPosts = [
+      {
+        id: 1,
+        content: 'This is my first post!',
+        timestamp: new Date().toISOString(),
+        author: { id: user.id, name: user.name }
+      },
+      {
+        id: 2,
+        content: 'Loving this platform so far!',
+        timestamp: new Date().toISOString(),
+        author: { id: user.id, name: user.name }
+      }
+    ];
+
+    setUserPosts(dummyPosts);
+  }, [user]);
+
+  if (!user) return <p>Please log in to view your profile.</p>;
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>{user.name}'s Profile</Typography>
-      <Typography>Email: {user.email}</Typography>
-      <Typography sx={{ mb: 4 }}>Bio: {user.bio || 'No bio yet.'}</Typography>
+    <div className="profile-page">
+      <div className="profile-header">
+        <h2>{user.name}</h2>
+        <p><strong>Email:</strong> {user.email}</p>
+        <p><strong>Bio:</strong> {user.bio || 'No bio yet.'}</p>
+      </div>
 
-      {posts.map(post => (
-        <PostCard key={post.id} post={post} />
-      ))}
-    </Container>
+      <div className="profile-posts">
+        <h3>Your Posts</h3>
+        {userPosts.length === 0 ? (
+          <p>No posts yet.</p>
+        ) : (
+          userPosts.map(post => (
+            <PostCard key={post.id} post={post} />
+          ))
+        )}
+      </div>
+    </div>
   );
 };
 

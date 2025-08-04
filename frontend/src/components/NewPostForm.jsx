@@ -1,46 +1,41 @@
+// src/components/NewPostForm.jsx
 import { useState } from 'react';
-import { Box, TextField, Button, Paper } from '@mui/material';
+import { useAuth } from '../Context/AuthContext';
 
-const NewPostForm = ({ onPostSubmit }) => {
+const NewPostForm = ({ onAddPost }) => {
+  const { user } = useAuth();
   const [content, setContent] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!content.trim()) return;
 
     const newPost = {
-      id: Date.now(), // temporary ID
+      id: Date.now(),
       content,
       timestamp: new Date().toISOString(),
       author: {
-        id: 123,
-        name: 'Current User'
+        id: user.id,
+        name: user.name
       }
     };
 
-    onPostSubmit(newPost); // pass it to parent
-    setContent(''); // clear input
+    onAddPost(newPost);
+    setContent('');
   };
 
+  if (!user) return null;
+
   return (
-    <Paper elevation={2} sx={{ mb: 3, p: 2 }}>
-      <form className="bg-white shadow-md rounded-lg p-4 space-y-4" onSubmit={handleSubmit}>
-        <TextField
-          label="What's on your mind?"
-          multiline
-          fullWidth
-          rows={3}
-          className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          variant="outlined"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-        <Box className="flex justify-end" display="flex" justifyContent="flex-end" mt={2}>
-          <Button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400" type="submit" variant="contained">Post</Button>
-        </Box>
-      </form>
-    </Paper>
+    <form onSubmit={handleSubmit} className="post-form">
+      <textarea
+        placeholder="What's on your mind?"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        required
+      />
+      <button type="submit">Post</button>
+    </form>
   );
 };
 

@@ -1,79 +1,38 @@
-import { useEffect, useState } from 'react';
-import { Box, Typography, Container, CircularProgress } from '@mui/material';
-import axios from 'axios';
-import PostCard from '../components/PostCard';
+// src/pages/Home.jsx
+import { useState, useEffect } from 'react';
 import NewPostForm from '../components/NewPostForm';
+import PostCard from '../components/PostCard';
 
 const Home = () => {
-
-    const dummyPost = [{
-        id: 1,
-        content: "This is a test post to check rendering.",
-        timestamp: new Date().toISOString(),
-        author: {
-          id: 1,
-          name: "Jane Developer"
-        }
-      },
-      {
-        id: 2,
-        content: "This is a test post to check rendering.",
-        timestamp: new Date().toISOString(),
-        author: {
-          id: 1,
-          name: "Jane Developer"
-        }
-      },
-    ];
-
   const [posts, setPosts] = useState([]);
+
   const handleNewPost = (newPost) => {
     setPosts([newPost, ...posts]);
   };
-  const fetchPosts = async () => {
-    try {
-      // const res = await axios.get('http://localhost:5000/api/posts');
-      // setPosts(res.data);
-      setPosts(dummyPost);
-    } catch (err) {
-      console.error('Failed to load posts');
-    }
-  };
 
   useEffect(() => {
-    fetchPosts();
+    // Simulate fetching
+    const dummyPosts = [
+      {
+        id: 1,
+        content: 'Hello, this is a test post!',
+        timestamp: new Date().toISOString(),
+        author: { id: 1, name: 'Jane Developer' }
+      }
+    ];
+    setPosts(dummyPosts);
   }, []);
 
   return (
-    <Container
-  maxWidth="sm"
-  sx={{
-    mt: 4,
-    mb: 4,
-    px: 2,
-  }}
->
-  <Typography variant="h4" gutterBottom>
-    Recent Posts
-  </Typography>
-
-  {posts.length === 0 ? (
-    <CircularProgress />
-  ) : (
-    <>
-      <Box sx={{ mt: 4 }}>
-        <NewPostForm onPostSubmit={handleNewPost} />
-      </Box>
-
-      <Box sx={{ mt: 4 }}>
+    <div className="home-page">
+      <h2>Recent Posts</h2>
+      <NewPostForm onAddPost={handleNewPost} />
+      <div className="post-list">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
-      </Box>
-    </>
-  )}
-</Container>
-
+      </div>
+    </div>
   );
 };
 

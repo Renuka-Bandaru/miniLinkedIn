@@ -1,23 +1,16 @@
-import { Card, CardContent, Typography, Box } from '@mui/material';
-import { formatDistanceToNow } from 'date-fns';
-
 const PostCard = ({ post }) => {
+  const { content, timestamp, author } = post;
+
+  const formatDate = (ts) => {
+    return new Date(ts).toLocaleString();
+  };
+
   return (
-    <Card className="bg-white shadow-sm border border-gray-200 rounded-md p-4">
-      <CardContent >
-        <Box  display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1" fontWeight="bold">
-            {post.author?.name || 'Anonymous'}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
-          </Typography>
-        </Box>
-        <Typography variant="body1" sx={{ mt: 1 }}>
-          {post.content}
-        </Typography>
-      </CardContent>
-    </Card>
+    <div className="post-card">
+      <p className="post-author">{author.name}</p>
+      <p className="post-content">{content}</p>
+      <p className="post-timestamp">{formatDate(timestamp)}</p>
+    </div>
   );
 };
 
