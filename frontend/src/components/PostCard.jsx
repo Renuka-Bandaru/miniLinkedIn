@@ -7,7 +7,7 @@ const PostCard = ({ post }) => {
 
   return (
     <div className="post-card">
-      <p className="post-author">{author.name}</p>
+      <p className="post-author">{author?.name || "Unknown User"}</p>
       <p className="post-content">{content}</p>
       <p className="post-timestamp">{formatDate(timestamp)}</p>
     </div>

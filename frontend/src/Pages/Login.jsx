@@ -2,6 +2,7 @@ import { useState } from 'react';
 import '../Styles/Auth.css'
 import { useAuth } from '../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../Utils/apiCalls';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -12,19 +13,21 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Login:', formData);
 
-    const dummyUser = {
-      id: Date.now(),
-      email: formData.email,
-      name: 'Sample User',
-      bio: 'This is a sample bio',
-    };
+    try {
+      const data = await loginUser({ email: formData.email, password: formData.password });
+      localStorage.setItem('token', data.token);
+      alert('Login success');
+      login(data.token);
+    } catch (err) {
+      alert(err.message);
+    }
     
-      navigate('/');
-    login(dummyUser);
+      navigate('/profile');
+    
   };
 
   return (

@@ -1,30 +1,22 @@
 // src/components/NewPostForm.jsx
 import { useState } from 'react';
 import { useAuth } from '../Context/AuthContext';
+import { createPost } from '../Utils/apiCalls';
 
 const NewPostForm = ({ onAddPost }) => {
-  const { user } = useAuth();
   const [content, setContent] = useState('');
+  const { token, user } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim()) return;
 
-    const newPost = {
-      id: Date.now(),
-      content,
-      timestamp: new Date().toISOString(),
-      author: {
-        id: user.id,
-        name: user.name
-      }
-    };
-
-    onAddPost(newPost);
-    setContent('');
+    const newPost = await createPost(content, token);
+    if (newPost) {
+      onAddPost(newPost);
+      setContent('');
+    }
   };
-
-  if (!user) return null;
 
   return (
     <form onSubmit={handleSubmit} className="post-form">
@@ -32,7 +24,7 @@ const NewPostForm = ({ onAddPost }) => {
         placeholder="What's on your mind?"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        required
+        rows="3"
       />
       <button type="submit">Post</button>
     </form>

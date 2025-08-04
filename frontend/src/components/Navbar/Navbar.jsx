@@ -4,8 +4,12 @@ import { useAuth } from '../../Context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate()
-  const {user, logout} = useAuth();
+  const {token, logout} = useAuth();
 
+  const handleLogout = () => {
+    logout();          // clear token and context
+    navigate("/");     // redirect to homepage
+  };
 
   return (
 
@@ -19,9 +23,9 @@ const Navbar = () => {
           <Link to="/">Home</Link>
           
           
-            {user ? (
+            {token ? (
               <>
-              <button onClick={logout}>Logout</button>
+              <button onClick={handleLogout}>Logout</button>
               <Link to='/profile' >Profile</Link>
               </>
               

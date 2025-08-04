@@ -1,40 +1,59 @@
 // src/pages/Profile.jsx
-import { useAuth } from '../Context/AuthContext';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import PostCard from '../components/PostCard';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
-    // Simulate fetching user-specific posts
-    const dummyPosts = [
-      {
-        id: 1,
-        content: 'This is my first post!',
-        timestamp: new Date().toISOString(),
-        author: { id: user.id, name: user.name }
-      },
-      {
-        id: 2,
-        content: 'Loving this platform so far!',
-        timestamp: new Date().toISOString(),
-        author: { id: user.id, name: user.name }
+    const fetchProfileAndPosts = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("Token not found");
+        return;
       }
-    ];
 
-    setUserPosts(dummyPosts);
-  }, [user]);
+      try {
+        // Fetch user profile
+        const profileRes = await axios.get("http://localhost:5000/api/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
 
-  if (!user) return <p>Please log in to view your profile.</p>;
+        const profileData = profileRes.data;
+        setProfile(profileData);
+
+        // ✅ Corrected endpoint for fetching user posts
+        const postsRes = await axios.get(`http://localhost:5000/api/posts/${profileData.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+
+        setUserPosts(postsRes.data);
+
+      } catch (err) {
+        console.error("Failed to fetch profile or posts", err);
+      }
+    };
+
+    fetchProfileAndPosts();
+  }, []);
+
+  if (!profile) return <p>Loading profile...</p>;
 
   return (
     <div className="profile-page">
       <div className="profile-header">
-        <h2>{user.name}</h2>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Bio:</strong> {user.bio || 'No bio yet.'}</p>
+        <h2>{profile.name}</h2>
+        <p><strong>Email:</strong> {profile.email}</p>
+        <p><strong>Bio:</strong> {profile.bio || 'No bio yet.'}</p>
       </div>
 
       <div className="profile-posts">
@@ -43,7 +62,14 @@ const Profile = () => {
           <p>No posts yet.</p>
         ) : (
           userPosts.map(post => (
-            <PostCard key={post.id} post={post} />
+            <PostCard
+              key={post.id}
+              post={{
+                content: post.content,
+                timestamp: post.created_at,
+                author: { name: profile.name }
+              }}
+            />
           ))
         )}
       </div>

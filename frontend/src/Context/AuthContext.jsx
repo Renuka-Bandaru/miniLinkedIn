@@ -1,30 +1,36 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+// src/context/AuthContext.jsx
+import { createContext, useContext, useState, useEffect } from "react";
+
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // Get user from localStorage if available
-    const storedUser = localStorage.getItem('miniLinkedinUser');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('miniLinkedinUser', JSON.stringify(userData));
+  const login = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
   };
 
   const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
     setUser(null);
-    localStorage.removeItem('miniLinkedinUser');
   };
 
+  useEffect(() => {
+    if (token) {
+    
+      setUser({}); // dummy user, or fetch profile
+    }
+  }, [token]);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to access context
 export const useAuth = () => useContext(AuthContext);

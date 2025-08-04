@@ -23,8 +23,9 @@ exports.createPost = (req, res) => {
 
 // Get all posts
 exports.getAllPosts = (req, res) => {
-  const query = `
-    SELECT posts.id, posts.content, posts.created_at, users.name, users.id as user_id
+
+    const query = `
+    SELECT posts.id, posts.content, posts.created_at, users.name as author_name, users.id as author_id
     FROM posts
     JOIN users ON posts.user_id = users.id
     ORDER BY posts.created_at DESC
@@ -33,8 +34,19 @@ exports.getAllPosts = (req, res) => {
     if (err) {
       return res.status(500).json({ message: "Failed to fetch posts." });
     }
+    //Transform each row to include author object
+    const formattedPosts = rows.map(row => ({
+      id: row.id,
+      content: row.content,
+      timestamp: row.created_at,
+      author: {
+        id: row.author_id,
+        name: row.author_name
+      }
+    }));
 
-    res.json(rows);
+    res.json(formattedPosts);
+  
   });
 };
 

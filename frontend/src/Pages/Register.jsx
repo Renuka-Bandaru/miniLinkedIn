@@ -2,18 +2,27 @@
 import { useState } from 'react';
 import '../Styles/Auth.css'
 import { useAuth } from '../Context/AuthContext';
+import { registerUser } from '../Utils/apiCalls';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: ''});
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    try {
+      const res = await registerUser({name: formData.name, email: formData.email, password: formData.password });
+      alert('Registration successful!');
+    } catch (err) {
+      alert(err.message);
+    }
     const newUser = {
       id: Date.now(),
       ...formData
@@ -21,6 +30,7 @@ const Register = () => {
 
     login(newUser);
     console.log('Register:', formData);
+    navigate('/login')    
   };
 
   return (

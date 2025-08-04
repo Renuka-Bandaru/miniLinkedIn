@@ -1,7 +1,8 @@
-// src/pages/Home.jsx
 import { useState, useEffect } from 'react';
 import NewPostForm from '../components/NewPostForm';
 import PostCard from '../components/PostCard';
+import { getAllPosts } from '../Utils/apiCalls';
+
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -11,16 +12,11 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // Simulate fetching
-    const dummyPosts = [
-      {
-        id: 1,
-        content: 'Hello, this is a test post!',
-        timestamp: new Date().toISOString(),
-        author: { id: 1, name: 'Jane Developer' }
-      }
-    ];
-    setPosts(dummyPosts);
+    const fetchPosts = async () => {
+      const allPosts = await getAllPosts();
+      setPosts(allPosts);
+    };
+    fetchPosts();
   }, []);
 
   return (
