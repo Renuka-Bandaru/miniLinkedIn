@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../Database/db");
 
-const JWT_SECRET = process.env.JWT_SECRET || "yoursecret"; // fallback for development
+const JWT_SECRET = process.env.JWT_SECRET || "secretKey"; 
 
 // Register
 exports.register = (req, res) => {
