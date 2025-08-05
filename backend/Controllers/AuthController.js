@@ -15,22 +15,31 @@ exports.register = (req, res) => {
 
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`;
-  db.run(query, [name, email, hashedPassword], function (err) {
-    if (err) {
-      return res.status(500).json({ message: "User already exists or DB error." });
-    }
+  try {
+    const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`;
+    const stmt = db.prepare(query);
+    stmt.run(name, email, hashedPassword);
+  
     res.status(201).json({ message: "User registered successfully!" });
-  });
-};
-
+  } catch (err) {
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      // Specific error for UNIQUE constraint (e.g., email already exists)
+      return res.status(400).json({ message: "User already exists." });
+    }
+    console.error("DB Error:", err);
+    res.status(500).json({ message: "Database error during registration." });
+  }
+  
+}
 // Login
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
-  const query = `SELECT * FROM users WHERE email = ?`;
-  db.get(query, [email], (err, user) => {
-    if (err || !user) {
+  try {
+    const stmt = db.prepare("SELECT * FROM users WHERE email = ?");
+    const user = stmt.get(email); // returns undefined if no match
+
+    if (!user) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
@@ -41,6 +50,13 @@ exports.login = (req, res) => {
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(200).json({ token, user: { id: user.id, name: user.name, email: user.email } });
-  });
+    res.status(200).json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email },
+    });
+
+  } catch (error) {
+    console.error("Login error:", error.message);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
