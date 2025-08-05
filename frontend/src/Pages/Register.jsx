@@ -16,22 +16,25 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log('Login:', formData);
+  
     try {
-      const res = await registerUser({name: formData.name, email: formData.email, password: formData.password });
-      alert('Registration successful!');
-    } catch (err) {
-      alert(err.message);
-    }
-    const newUser = {
-      id: Date.now(),
-      ...formData
-    };
+      // Call the registerUser API with the form data
+      const data = await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
 
-    login(newUser);
-    console.log('Register:', formData);
-    navigate('/login')    
+
+      alert('Registration successful!');
+      navigate('/login');
+    } catch (err) {
+      // Show error message from backend or a default one
+      alert(err.message || 'Registration failed');
+    }
   };
+  
 
   return (
     <div className="auth-container">

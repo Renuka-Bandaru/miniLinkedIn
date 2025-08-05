@@ -1,12 +1,13 @@
 // src/pages/Profile.jsx
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import PostCard from '../components/PostCard';
+import api from '../Utils/Api';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
 
+  
   useEffect(() => {
     const fetchProfileAndPosts = async () => {
       const token = localStorage.getItem("token");
@@ -18,7 +19,7 @@ const Profile = () => {
 
       try {
         // Fetch user profile
-        const profileRes = await axios.get("http://localhost:5000/api/profile", {
+        const profileRes = await api.get('api/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -28,8 +29,8 @@ const Profile = () => {
         const profileData = profileRes.data;
         setProfile(profileData);
 
-        // ✅ Corrected endpoint for fetching user posts
-        const postsRes = await axios.get(`http://localhost:5000/api/posts/${profileData.id}`, {
+        
+        const postsRes = await api.get(`api/posts/${profileData.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
