@@ -13,7 +13,7 @@ app.use(express.json());
 
 const authRoutes = require("./Routes/Auth");
 const profileRoutes = require("./Routes/Profile");
-const postRoutes = require("./Routes/posts");
+const postRoutes = require("./Routes/Posts");
 
 app.use("/api", authRoutes);
 app.use("/api/profile", profileRoutes);
