@@ -5,10 +5,13 @@ const cors = require("cors");
 dotenv.config();
 
 const app = express();
+const allowedOrigins = ['https://fullstacklinkedup.netlify.app'];
+
 app.use(cors({
-    origin: "https://fullstacklinkedup.netlify.app/", 
-    credentials: true
-  }));
+  origin: allowedOrigins,
+  credentials: true, 
+}));
+
 app.use(express.json());
 
 const authRoutes = require("./Routes/Auth");
